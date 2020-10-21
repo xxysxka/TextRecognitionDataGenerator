@@ -21,7 +21,7 @@ second_line_font_size = 15
 font = []
 font_dir = "../TraditionalChinese_fonts"
 background_img_dir = "./test/"
-
+line_space = 5
 
 def paste_bbox(bboxs, x, y):
     for box in bboxs:
@@ -119,8 +119,8 @@ def main():
         ###### paste first line ######
         
         ###### paste second line　###### 
-        img.paste(img2, (x, y+img1.height))
-        bbox2 = paste_bbox(bbox2, x, y+img1.height)
+        img.paste(img2, (x, y+img1.height+line_space))
+        bbox2 = paste_bbox(bbox2, x, y+img1.height+line_space)
         
         '''
         for box in bbox2:
