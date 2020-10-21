@@ -1,5 +1,6 @@
 import random as rnd
 import os
+import sys
 import copy
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -9,19 +10,28 @@ from trdg.generators import (
     GeneratorFromStrings,
     GeneratorFromWikipedia,
 )
+from trdg.string_generator import (
+    create_strings_from_dict,
+    create_strings_from_file,
+    create_strings_from_wikipedia,
+    create_strings_randomly,
+)
+
+from trdg.utils import load_dict, load_fonts
 
 image_width = 0
 image_height = 0
 out_dir = "./output/"
-count = 10
-first_line_strings = ["NSFJS","SFSJF","FSFDJKS"]
-second_line_strings = ["23235","12378","8975"] 
-first_line_font_size = 20
-second_line_font_size = 15
+count = 2
+length = [5, 3]
+random_length = [False, True]
+font_size = [20, 15]
+dict_dir = "/home/smartmore/tools/trdg/TextRecognitionDataGenerator/trdg/dicts/en.txt"
 font = []
 font_dir = "../TraditionalChinese_fonts"
 background_img_dir = "./test/"
 line_space = 5
+language = "en"
 
 def paste_bbox(bboxs, x, y):
     for box in bboxs:
@@ -38,8 +48,7 @@ def unpack_generator(generator):
     for res, lb in generator:
         img = res[0]
         bbox = res[1]
-        generator_list.append([img, bbox, lb])
-    return generator_list
+    return img, bbox, lb
 
 def multiline_load_fonts(font_dir, font):
     #Create font (path) list
@@ -76,31 +85,45 @@ def generate_background_img(image_dir, width, height):
 
 def main():
     fonts = multiline_load_fonts(font_dir, font)
+   
+    lang_dict = []
+    if os.path.isfile(dict_dir):
+        with open(dict_dir, "r", encoding="utf8", errors="ignore") as d:
+            lang_dict = [l for l in d.read().splitlines() if len(l) > 0]
     
+    else:
+        sys.exit("Cannot open dict")
     
-    generator1 = GeneratorFromStrings(
-    strings=first_line_strings,
-    count=len(first_line_strings),
-    size=first_line_font_size,
-    bounding_box=True,
-    fonts=fonts,
-    )
-    generator1_list = unpack_generator(generator1)
+    strings1 = create_strings_from_dict(length[0], random_length[0], count, lang_dict)
+    strings2 = create_strings_from_dict(length[1], random_length[1], count, lang_dict)
 
-    generator2 = GeneratorFromStrings(
-    strings=second_line_strings,
-    size=second_line_font_size,
-    count=len(second_line_strings),
-    bounding_box=True,
-    fonts=fonts,
-    )
-    generator2_list = unpack_generator(generator2)
     
     for i in range(count):
-        first_line = copy.deepcopy(rnd.choice(generator1_list))
-        second_line = copy.deepcopy(rnd.choice(generator2_list))
-        img1, bbox1, lb1 = first_line
-        img2, bbox2, lb2 = second_line
+        generator1 = GeneratorFromStrings(
+            strings=rnd.choices(strings1),
+            count=len(strings1),
+            size=font_size[0],
+            bounding_box=True,
+            fonts=fonts,
+            background_type=1,
+            text_color ="#FFFFFF"
+        )
+        img1, bbox1, lb1 = unpack_generator(generator1)
+
+        generator2 = GeneratorFromStrings(
+            strings = rnd.choices(strings2),
+            size=font_size[1],
+            count=len(strings2),
+            bounding_box=True,
+            fonts=fonts,
+            background_type=1,
+            text_color="#FFFFFF"
+        )
+        img2, bbox2, lb2 = unpack_generator(generator2)
+        #first_line = copy.deepcopy(rnd.choice(generator1_list))
+        #second_line = copy.deepcopy(rnd.choice(generator2_list))
+        #img1, bbox1, lb1 = first_line
+        #img2, bbox2, lb2 = second_line
 
         img = generate_background_img(background_img_dir, image_width, image_height)
         img_draw = ImageDraw.Draw(img)
@@ -109,17 +132,17 @@ def main():
         
 
         ###### paste first line ######
-        img.paste(img1, (x, y)) 
+        img.paste(img1, (x, y), img1) 
         bbox1 = paste_bbox(bbox1, x, y)
         
-        '''
+        ''' 
         for box in bbox1:
             img_draw.polygon(box, outline = (255, 0, 0), )
         '''
         ###### paste first line ######
         
         ###### paste second line　###### 
-        img.paste(img2, (x, y+img1.height+line_space))
+        img.paste(img2, (x, y+img1.height+line_space), img2)
         bbox2 = paste_bbox(bbox2, x, y+img1.height+line_space)
         
         '''

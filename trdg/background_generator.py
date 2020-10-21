@@ -25,8 +25,9 @@ def plain_white(height, width):
     """
         Create a plain white background
     """
-
-    return Image.new("L", (width, height), 255).convert("RGBA")
+    
+    #return Image.new("L", (width, height), 255).convert("RGBA")
+    return Image.new("RGBA", (width, height), (0, 0, 0, 0))
 
 
 def quasicrystal(height, width):

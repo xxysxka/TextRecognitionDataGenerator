@@ -234,7 +234,6 @@ class FakeTextDataGenerator(object):
         background_mask = Image.new(
             "RGB", (background_width, background_height), (0, 0, 0)
         )
-
         #############################
         # Place text with alignment #
         #############################
@@ -267,7 +266,6 @@ class FakeTextDataGenerator(object):
                 (background_width - new_text_width - margin_right, margin_top),
             )
             background_offset_width = background_width - new_text_width - margin_right
-        
         ########## Written by xy.huang ##########
         if bounding_box == True:
             for box in boxs:
@@ -287,7 +285,7 @@ class FakeTextDataGenerator(object):
         )
         final_image = background_img.filter(gaussian_filter)
         final_mask = background_mask.filter(gaussian_filter)
-
+        
         #####################################
         # Generate name for resulting image #
         #####################################
@@ -335,5 +333,7 @@ class FakeTextDataGenerator(object):
                         f.write('\r\n')
         else:
             if output_mask == 1:
-                return final_image.convert("RGB"), final_mask.convert("RGB"), boxs
-            return final_image.convert("RGB"), boxs
+                #return final_image.convert("RGBA"), final_mask.convert("RGB"), boxs
+                return final_image, final_mask, boxs
+            #return final_image.convert("RGBA"), boxs
+            return final_image, boxs

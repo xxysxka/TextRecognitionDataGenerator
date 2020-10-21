@@ -6,9 +6,9 @@ from trdg.generators import (
 )
 
 
-generator = GeneratorFromStrings(
-    ['Test1', 'Test2', 'Test3'],
-    count=5, 
+generator = GeneratorFromDict(
+    language=,
+    count=2, 
     blur=2,
     random_blur=True
 )
