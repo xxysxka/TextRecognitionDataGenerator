@@ -10,12 +10,18 @@ from trdg.generators import (
     GeneratorFromWikipedia,
 )
 
-img_width = 400
-img_height = 200
+image_width = 0
+image_height = 0
 out_dir = "./output/"
 count = 10
 first_line_strings = ["NSFJS","SFSJF","FSFDJKS"]
 second_line_strings = ["23235","12378","8975"] 
+first_line_font_size = 20
+second_line_font_size = 15
+font = []
+font_dir = "../TraditionalChinese_fonts"
+background_img_dir = "./test/"
+
 
 def paste_bbox(bboxs, x, y):
     for box in bboxs:
@@ -35,20 +41,58 @@ def unpack_generator(generator):
         generator_list.append([img, bbox, lb])
     return generator_list
 
+def multiline_load_fonts(font_dir, font):
+    #Create font (path) list
+    if font_dir != "":
+        fonts = [
+            os.path.join(font_dir, p)
+            for p in os.listdir(font_dir)
+            if os.path.splitext(p)[1] == ".ttf"
+        ]
+    elif font != []:
+        if os.path.isfile(font):
+            fonts = [font]
+        else:
+            sys.exit("Cannot open font")
+    else:
+        fonts = []
+    return fonts
+
+def generate_background_img(image_dir, width, height):
+    if image_dir != "":
+        images = os.listdir(image_dir)
+        if len(images) > 0:
+            pic = Image.open(
+                os.path.join(image_dir, images[rnd.randint(0, len(images) - 1)])
+            )
+            pic = pic.resize((max(pic.width, width), max(pic.height, height)), Image.ANTIALIAS
+            )
+        else:
+            raise Exception("No images where found in the images folder!")
+    else :
+        pic = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    return pic
+
+
 def main():
+    fonts = multiline_load_fonts(font_dir, font)
+    
+    
     generator1 = GeneratorFromStrings(
     strings=first_line_strings,
     count=len(first_line_strings),
-    size=60,
+    size=first_line_font_size,
     bounding_box=True,
+    fonts=fonts,
     )
     generator1_list = unpack_generator(generator1)
 
     generator2 = GeneratorFromStrings(
     strings=second_line_strings,
-    size=40,
+    size=second_line_font_size,
     count=len(second_line_strings),
     bounding_box=True,
+    fonts=fonts,
     )
     generator2_list = unpack_generator(generator2)
     
@@ -58,34 +102,37 @@ def main():
         img1, bbox1, lb1 = first_line
         img2, bbox2, lb2 = second_line
 
-        img = Image.new("RGBA", (img_width, img_height), (0, 0, 0, 0))
+        img = generate_background_img(background_img_dir, image_width, image_height)
         img_draw = ImageDraw.Draw(img)
-
-        x = rnd.randint(0, img_width-max(img1.width, img2.width))
-        y = rnd.randint(0, img_height-img1.height-img2.height)
+        x = rnd.randint(0, img.width-max(img1.width, img2.width))
+        y = rnd.randint(0, img.height-img1.height-img2.height)
         
 
         ###### paste first line ######
         img.paste(img1, (x, y)) 
         bbox1 = paste_bbox(bbox1, x, y)
-         
+        
+        '''
         for box in bbox1:
             img_draw.polygon(box, outline = (255, 0, 0), )
+        '''
         ###### paste first line ######
         
         ###### paste second line　###### 
         img.paste(img2, (x, y+img1.height))
         bbox2 = paste_bbox(bbox2, x, y+img1.height)
-
+        
+        '''
         for box in bbox2:
             img_draw.polygon(box, outline = (0, 255, 0), )
+        '''
         ###### paste second line　######
         img = img.convert("RGB")
         img.save(out_dir+lb1+lb2+".jpg")
         
         with open (os.path.join(out_dir, lb1+lb2+'.txt'), mode = 'w') as f:
             for box, p  in zip(bbox1+bbox2, lb1+lb2):
-                f.write(str(box) + p)
+                f.write(str(box)+p)
                 f.write('\r\n')
 
         
