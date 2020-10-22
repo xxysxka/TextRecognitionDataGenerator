@@ -1,4 +1,4 @@
-TextRecognitionDataGenerator 
+### TextRecognitionDataGenerator 
 
 #### Forked from [Belval/TextRecognitionDataGenerator](https://github.com/Belval/TextRecognitionDataGenerator)
 
