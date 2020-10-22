@@ -1,4 +1,4 @@
-# TextRecognitionDataGenerator 
+TextRecognitionDataGenerator 
 
 #### Forked from [Belval/TextRecognitionDataGenerator](https://github.com/Belval/TextRecognitionDataGenerator)
 
@@ -29,9 +29,13 @@ Generating text image samples to train an OCR software. Now supporting non-latin
 
   - Add `--radius` argument to define the curved text radius 
 
-    ![30](./samples/33.jpg)
-
-
+  - support to  use `-cs `  to define the character space  
+  
+    <img src="./samples/35.jpg">
+    
+    <img src="./samples/33.jpg">
+    
+    
 
 ## Feature request & issues
 

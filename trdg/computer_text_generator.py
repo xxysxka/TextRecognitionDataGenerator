@@ -236,7 +236,7 @@ def _generate_curved_text(
         rnd.randint(min(c1[0], c2[0]), max(c1[0], c2[0])),
         rnd.randint(min(c1[1], c2[1]), max(c1[1], c2[1])),
         rnd.randint(min(c1[2], c2[2]), max(c1[2], c2[2])),
-        #128,
+        #0,
         )
     
     arclength = 0
@@ -255,22 +255,22 @@ def _generate_curved_text(
                 fill = fill,
                 font = image_font,
                 )
-        '''
-        char_img_draw.text(
-                (char_img.width/2, char_img.height/2),
-                "*",
-                fill = fill,
-                font = image_font,
-                )
-        '''
+        
         theta = theta + math.pi/2
         angle = theta  * 180 / math.pi
         char_img_rotated = char_img.rotate((360-angle), expand = True,)
-        x = round(x)
-        y = round(y)
+        
+        expand_offset = [
+            (char_img_rotated.width - char_img.width) /2,
+            (char_img_rotated.height - char_img.height) /2
+            ] 
+        x = round(x-expand_offset[0])
+        y = round(y-expand_offset[1])
+        
         txt_img.paste(char_img_rotated, (x, y), char_img_rotated)
         mask_img.paste(char_img_rotated, (x, y))
         
+        #rotate bounding box
         if c != ' ':
             box = [
                 x, y,
@@ -279,14 +279,11 @@ def _generate_curved_text(
                 x, y+piece_heights[i],
                 ]
              
-            expand_matrix = np.stack([
-                (char_img_rotated.width - char_img.width) /2,
-                (char_img_rotated.height - char_img.height) /2
-                ], axis=0) 
-
+            expand_matrix = np.reshape(expand_offset, [1, 2])
+            
             center = np.stack([x+char_img_rotated.width/2, y+char_img_rotated.height/2], axis=0)
             center = np.reshape(center, [1, 2])
-                    
+            
             rotation = np.stack([math.cos(theta), math.sin(theta), -math.sin(theta), math.cos(theta)], axis=0)
             rotation_matrix = np.reshape(rotation, [2, 2])
 
