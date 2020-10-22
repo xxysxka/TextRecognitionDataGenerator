@@ -23,8 +23,7 @@ Generating text image samples to train an OCR software. Now supporting non-latin
 
     
 
-- Add Curved text generation,  (first version .... )
-
+- Add Curved text generator,
   - you can define `-or 2` or `--orientation 2` to generate curved text
 
   - Add `--radius` argument to define the curved text radius 
