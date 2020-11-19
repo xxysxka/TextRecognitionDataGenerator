@@ -211,8 +211,9 @@ def _generate_curved_text(
         splitted_text = text
 
     piece_widths = [
-        image_font.getsize(p)[0]+space_width*character_spacing if p != " " else space_width for p in splitted_text
+        image_font.getsize(p)[0]+space_width if p != " " else space_width for p in splitted_text
     ]
+
     piece_heights = [
         image_font.getsize(p)[1] if p != " " else space_width for p in splitted_text
     ] 
@@ -241,9 +242,10 @@ def _generate_curved_text(
     
     arclength = 0
     bboxs = []
+    start_point = rnd.randint(0, 2)
     for i, c in enumerate(text):
         arclength += piece_widths[i]/2
-        theta = math.pi + arclength /r
+        theta = start_point*math.pi + arclength /r
         x = r * math.cos(theta) + img_width/2
         y = r * math.sin(theta) + img_height/2
 
@@ -263,9 +265,22 @@ def _generate_curved_text(
         expand_offset = [
             (char_img_rotated.width - char_img.width) /2,
             (char_img_rotated.height - char_img.height) /2
-            ] 
-        x = round(x-expand_offset[0])
-        y = round(y-expand_offset[1])
+            ]
+        expand_matrix = np.reshape(expand_offset, [1, 2])
+        
+        center = np.stack([x+char_img_rotated.width/2, y+char_img_rotated.height/2], axis=0)
+        center = np.reshape(center, [1, 2])
+        
+        rotation = np.stack([math.cos(theta), math.sin(theta), -math.sin(theta), math.cos(theta)], axis=0)
+        rotation_matrix = np.reshape(rotation, [2, 2])
+        
+        left_top = [x, y]
+        p = np.reshape(left_top, (1, 2))
+        p = p +  expand_matrix
+        p = np.matmul(p - center, rotation_matrix) + center
+        left_top_rotated = np.reshape(p, (2, )).tolist()
+        x = round(x - (left_top_rotated[0] - left_top[0]))
+        y = round(y - (left_top_rotated[1] - left_top[1]))
         
         txt_img.paste(char_img_rotated, (x, y), char_img_rotated)
         mask_img.paste(char_img_rotated, (x, y))
@@ -278,18 +293,13 @@ def _generate_curved_text(
                 x+image_font.getsize(c)[0], y+piece_heights[i],
                 x, y+piece_heights[i],
                 ]
-             
-            expand_matrix = np.reshape(expand_offset, [1, 2])
             
-            center = np.stack([x+char_img_rotated.width/2, y+char_img_rotated.height/2], axis=0)
-            center = np.reshape(center, [1, 2])
+            center_modified = np.stack([x+char_img_rotated.width/2, y+char_img_rotated.height/2], axis=0)
+            center_modified = np.reshape(center_modified, [1, 2])
             
-            rotation = np.stack([math.cos(theta), math.sin(theta), -math.sin(theta), math.cos(theta)], axis=0)
-            rotation_matrix = np.reshape(rotation, [2, 2])
-
             b = np.reshape(box, (4, 2))
             b = b +  expand_matrix
-            b = np.matmul(b - center, rotation_matrix) + center
+            b = np.matmul(b - center_modified, rotation_matrix) + center_modified
             box = np.reshape(b, (8, )).tolist()
             
             bboxs.append(box)
@@ -299,5 +309,5 @@ def _generate_curved_text(
     for coordinate in char_coordinates:
         txt_img_draw.polygon(coordinate, outline = (0, 255, 0))
     '''
-
+    #txt_img_draw.ellipse([img_width/2-r, img_height/2-r, img_width/2+r, img_height/2+r], outline='red', width=1)
     return txt_img, mask_img, bboxs

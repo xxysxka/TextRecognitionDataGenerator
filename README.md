@@ -28,11 +28,15 @@ Generating text image samples to train an OCR software. Now supporting non-latin
 
   - Add `--radius` argument to define the curved text radius 
 
-  - support the use of `-cs `  to define the character space  
+  - support the use of `-sw `  to define the space  width
   
     <img src="./samples/35.jpg">
     
     <img src="./samples/33.jpg">
+    
+    <img src="./samples/36.jpg">
+    
+    
     
     
 

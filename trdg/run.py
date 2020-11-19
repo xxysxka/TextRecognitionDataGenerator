@@ -248,7 +248,7 @@ def parse_arguments():
         type=float,
         nargs="?",
         help="Define the width of the spaces between words. 2.0 means twice the normal space width",
-        default=1.0,
+        default=0,
     )
     parser.add_argument(
         "-cs",

@@ -10,6 +10,6 @@
 
 #python run.py -c 1 -w 1 -l cn --dict ./dicts/Chinese_DRCD.txt -f 128  -fd /home/smartmore/tools/trdg/TextRecognitionDataGenerator/trdg/fonts/TraditionalChinese_fonts/
 
-python run.py -c 5 -w 15  -or 2  -fd ../../TraditionalChinese_fonts/   -bb   -f 30 --radius 100 -l cn 
+python run.py -c 100 -w 1 -or 2  -bb   -f 30 --radius 200 --draw_bbox
 
 
