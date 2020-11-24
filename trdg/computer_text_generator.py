@@ -244,7 +244,7 @@ def _generate_curved_text(
     bboxs = []
     start_point = rnd.randint(0, 2)
     for i, c in enumerate(text):
-        arclength += piece_widths[i]/2
+        #arclength += piece_widths[i]/2
         theta = start_point*math.pi + arclength /r
         x = r * math.cos(theta) + img_width/2
         y = r * math.sin(theta) + img_height/2
@@ -304,7 +304,7 @@ def _generate_curved_text(
             
             bboxs.append(box)
 
-        arclength += piece_widths[i]/2
+        arclength += piece_widths[i]
     ''' 
     for coordinate in char_coordinates:
         txt_img_draw.polygon(coordinate, outline = (0, 255, 0))
